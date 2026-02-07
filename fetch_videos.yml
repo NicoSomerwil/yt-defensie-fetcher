@@ -1,0 +1,34 @@
+name: Fetch Defensie YouTube Videos
+
+on:
+  schedule:
+    # Elke dag om 07:00 UTC (08:00 of 09:00 NL tijd)
+    - cron: '0 7 * * *'
+  workflow_dispatch: # Handmatig starten mogelijk
+
+jobs:
+  fetch-videos:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install yt-dlp
+
+      - name: Fetch latest videos
+        run: python yt_video_defensie_fetcher.py
+
+      - name: Commit en push CSV bestanden
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add yt_defensie/
+          git diff --cached --quiet || git commit -m "🎬 Update Defensie video's $(date +'%Y-%m-%d')"
+          git push
