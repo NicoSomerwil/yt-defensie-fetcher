@@ -1,6 +1,7 @@
-# YouTube Defensie Video Fetcher
+# KVEO Defensie feeds
 
-Haalt automatisch de laatste video op van 6 Nederlandse Defensie YouTube-kanalen en slaat ze op als CSV.
+Deze repository onderhoudt de gegevensbronnen voor de actuele Defensie-video's
+en -magazines op kveo.nl.
 
 ## Kanalen
 
@@ -15,18 +16,26 @@ Haalt automatisch de laatste video op van 6 Nederlandse Defensie YouTube-kanalen
 
 ## Automatisch (GitHub Actions)
 
-De workflow draait dagelijks om 07:00 UTC en commit de CSV-bestanden naar `yt_defensie/`.
+De videoworkflow draait dagelijks om 07:00 UTC en commit de CSV-bestanden naar
+`yt_defensie/`. De magazineworkflow controleert om 05:17 en 17:17 UTC de zes
+officiële magazine-overzichten en schrijft de nieuwste edities naar
+`data/defensie-magazines.json`.
 
-Handmatig starten: **Actions** → **Fetch Defensie YouTube Videos** → **Run workflow**
+Beide workflows kunnen ook handmatig worden gestart via **Actions**.
 
 ## Lokaal draaien
 
 ```bash
-pip install yt-dlp
 python yt_video_defensie_fetcher.py        # alle kanalen
 python yt_video_defensie_fetcher.py kl     # alleen Landmacht
+python scripts/update_magazine_feed.py      # zes magazines
 ```
+
+De videofetcher gebruikt de openbare YouTube Atom-feeds. Daardoor is geen
+API-sleutel of `yt-dlp` nodig.
 
 ## Output
 
-Per kanaal een CSV in `yt_defensie/` met kolommen: Titel, URL, Publicatiedatum, Kanaal.
+Per kanaal staat één CSV in `yt_defensie/` met de kolommen Titel, URL,
+Publicatiedatum en Kanaal. De magazinefeed staat in
+`data/defensie-magazines.json`.

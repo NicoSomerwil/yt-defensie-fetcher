@@ -1,66 +1,66 @@
-import subprocess
-import json
 import csv
 import sys
-import os
-import shutil
+import xml.etree.ElementTree as ET
+from pathlib import Path
+from urllib.request import Request, urlopen
 
-# Configuratie per kanaal
+
 CHANNELS = {
-    "kl": "https://www.youtube.com/@KoninklijkeLandmacht",
-    "klu": "https://www.youtube.com/@KoninklijkeLuchtmachtNL",
-    "km": "https://www.youtube.com/@Koninklijke-Marine",
-    "kmar": "https://www.youtube.com/@koninklijkemarechaussee8093",
-    "defensie": "https://www.youtube.com/@defensie",
-    "werken_bij_def": "https://www.youtube.com/@werkenbijdefensie"
+    "kl": "UCHiehyVZFy4mlNas4g3HCrQ",
+    "klu": "UCXlJaY7qJcoyNUnrfTvfV5Q",
+    "km": "UCXDl9qGTjAwhF2pvFPzaHOA",
+    "kmar": "UCRUc0CWOU3fFF_A20A6BN4g",
+    "defensie": "UC2Sxy2Y43M79hKw-nmJl1YQ",
+    "werken_bij_def": "UCKvLISFSRyOe6WS_Yrmphfw",
 }
-
-# Zoek yt-dlp: gebruik pad uit env var, of zoek automatisch
-YT_DLP = os.environ.get("YT_DLP_PATH") or shutil.which("yt-dlp")
-
-if not YT_DLP:
-    print("yt-dlp niet gevonden. Installeer met: pip install yt-dlp")
-    sys.exit(1)
+OUTPUT_DIR = Path(__file__).resolve().parent / "yt_defensie"
+ATOM = "http://www.w3.org/2005/Atom"
+YT = "http://www.youtube.com/xml/schemas/2015"
 
 
-def fetch_latest_video(channel_key):
-    channel_url = CHANNELS[channel_key]
+def fetch_latest_video(channel_key: str) -> None:
+    channel_id = CHANNELS[channel_key]
+    feed_url = f"https://www.youtube.com/feeds/videos.xml?channel_id={channel_id}"
+    request = Request(feed_url, headers={"User-Agent": "KVEO video feed updater/2.0 (+https://kveo.nl)"})
+    with urlopen(request, timeout=30) as response:
+        root = ET.fromstring(response.read())
 
-    result = subprocess.run([
-        YT_DLP,
-        "--dateafter", "now-1year",
-        "--dump-json",
-        "--playlist-end", "1",
-        f"{channel_url}/videos"
-    ], capture_output=True, text=True)
+    entry = root.find(f"{{{ATOM}}}entry")
+    if entry is None:
+        raise RuntimeError(f"Geen video gevonden voor {channel_key} ({channel_id})")
 
-    if not result.stdout.strip():
-        print(f"Geen video gevonden voor {channel_key}")
-        return
+    video_id = entry.findtext(f"{{{YT}}}videoId")
+    title = entry.findtext(f"{{{ATOM}}}title")
+    published = entry.findtext(f"{{{ATOM}}}published")
+    author = entry.find(f"{{{ATOM}}}author")
+    channel = author.findtext(f"{{{ATOM}}}name") if author is not None else ""
+    if not video_id or not title or not published:
+        raise RuntimeError(f"Onvolledige feed voor {channel_key} ({channel_id})")
 
-    video_json = json.loads(result.stdout.strip())
-    video_url = f"https://www.youtube.com/watch?v={video_json['id']}"
-
-    # CSV opslaan
-    csv_filename = f"yt_defensie/video_{channel_key}.csv"
-    os.makedirs("yt_defensie", exist_ok=True)
-
-    with open(csv_filename, "w", newline='', encoding='utf-8') as f:
-        writer = csv.DictWriter(f, fieldnames=["Titel", "URL", "Publicatiedatum", "Kanaal"])
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    output = OUTPUT_DIR / f"video_{channel_key}.csv"
+    with output.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=["Titel", "URL", "Publicatiedatum", "Kanaal"])
         writer.writeheader()
-        writer.writerow({
-            "Titel": video_json.get("title"),
-            "URL": video_url,
-            "Publicatiedatum": video_json.get("upload_date"),
-            "Kanaal": video_json.get("channel")
-        })
+        writer.writerow(
+            {
+                "Titel": title,
+                "URL": f"https://www.youtube.com/watch?v={video_id}",
+                "Publicatiedatum": published[:10].replace("-", ""),
+                "Kanaal": channel,
+            }
+        )
+    print(f"{output.relative_to(Path(__file__).resolve().parent)} opgeslagen")
 
-    print(f"✅ {csv_filename} opgeslagen")
+
+def main() -> None:
+    requested = sys.argv[1:] or list(CHANNELS)
+    unknown = [key for key in requested if key not in CHANNELS]
+    if unknown:
+        raise SystemExit(f"Onbekende kanaalsleutel(s): {', '.join(unknown)}")
+    for channel_key in requested:
+        fetch_latest_video(channel_key)
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        fetch_latest_video(sys.argv[1])
-    else:
-        for channel in CHANNELS.keys():
-            fetch_latest_video(channel)
+    main()
