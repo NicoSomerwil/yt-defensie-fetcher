@@ -1,0 +1,60 @@
+{
+  "generated_at": "2026-10-13T14:19:55+00:00",
+  "source": "https://www.defensie.nl/magazines",
+  "items": [
+    {
+      "id": "defensiekrant",
+      "title": "Defensiekrant",
+      "edition": "Editie 37",
+      "year": 2026,
+      "url": "https://www.defensie.nl/magazines/defensiekrant/2026/editie-37",
+      "image": "https://www.defensie.nl/assets/cover_26AHac.webp",
+      "overview_url": "https://www.defensie.nl/magazines/defensiekrant"
+    },
+    {
+      "id": "alle-hens",
+      "title": "Alle Hens",
+      "edition": "Editie 06",
+      "year": 2026,
+      "url": "https://www.defensie.nl/magazines/alle-hens/2026/editie-06",
+      "image": "https://www.defensie.nl/assets/alh-06-indexfoto_1HUb1u.webp",
+      "overview_url": "https://www.defensie.nl/magazines/alle-hens"
+    },
+    {
+      "id": "landmacht",
+      "title": "Landmacht",
+      "edition": "Editie 8",
+      "year": 2026,
+      "url": "https://www.defensie.nl/magazines/landmacht/2026/editie-8",
+      "image": "https://www.defensie.nl/assets/coverfoto-20260923wyz_certhu-12_Z7dixW.webp",
+      "overview_url": "https://www.defensie.nl/magazines/landmacht"
+    },
+    {
+      "id": "de-vliegende-hollander",
+      "title": "de Vliegende Hollander",
+      "edition": "Editie 9",
+      "year": 2026,
+      "url": "https://www.defensie.nl/magazines/de-vliegende-hollander/2026/editie-9",
+      "image": "https://www.defensie.nl/assets/first-flight-7_1EpLjY.webp",
+      "overview_url": "https://www.defensie.nl/magazines/de-vliegende-hollander"
+    },
+    {
+      "id": "kmarmagazine",
+      "title": "KMarMagazine",
+      "edition": "Editie 9",
+      "year": 2026,
+      "url": "https://www.defensie.nl/magazines/kmarmagazine/2026/editie-9",
+      "image": "https://www.defensie.nl/assets/cover_1i512j.webp",
+      "overview_url": "https://www.defensie.nl/magazines/kmarmagazine"
+    },
+    {
+      "id": "materieelgezien",
+      "title": "Materieelgezien",
+      "edition": "Editie 7",
+      "year": 2026,
+      "url": "https://www.defensie.nl/magazines/materieelgezien/2026/editie-7",
+      "image": "https://www.defensie.nl/assets/6-first-flight-8_1xDzKW.webp",
+      "overview_url": "https://www.defensie.nl/magazines/materieelgezien"
+    }
+  ]
+}
